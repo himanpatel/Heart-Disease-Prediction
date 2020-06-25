@@ -12,17 +12,12 @@ SelectAllColumns = list(ReadDataFromCsv.columns)
 features = SelectAllColumns
 opts = [{'label': i, 'value': i} for i in features]
 opts = opts[1:12]
-# trace_close = go.Scatter(x=list(ReadDataFromCsv.AP_HIGH),
-#                         y=list(ReadDataFromCsv.CARDIO_DISEASE),
-#                         name="Physical Activity Graph",
-#                         line=dict(color="#ff0000"))
 
 
 external_stylesheets = [
     'https://dash-gallery.plotly.host/dash-study-browser/assets/custom.css',
     'https://dash-gallery.plotly.host/dash-study-browser/assets/base.css'
 ]
-print(SelectAllColumns)
 app = dash.Dash(__name__,
                 external_stylesheets=external_stylesheets)
 
@@ -61,14 +56,14 @@ app.layout = html.Div(
                                     className="padding-top-bot",
                                     children=[
                                         html.H6("Select Attribute"),
-                                        dcc.Dropdown(id="x-axis-dropdown", options=opts, value=features[1]),
+                                        dcc.Dropdown(id="x-axis-dropdown", options=opts, value=features[1], clearable=False),
                                     ],
                                 ),
                                  html.Div(
                                     className="padding-top-bot",
                                     children=[
                                         html.H6("Filter Attribute"),
-                                        dcc.Dropdown(id="filter-dropdown", options=opts, value=features[2]),
+                                        dcc.Dropdown(id="filter-dropdown", options=opts, value=features[2], clearable=False),
                                     ],
                                 ),
                                  html.Div(
@@ -89,7 +84,7 @@ app.layout = html.Div(
                         html.Div(
                             className="bg-white",
                             children=[
-                                html.H5("Heart data plot"),
+                                html.H5("Cardiovascular Disease Graph"),
                                 dcc.Graph(id="heart-data-plot"),
                             ],
                         )
@@ -101,67 +96,49 @@ app.layout = html.Div(
     ]
 )
 
+@app.callback(dash.dependencies.Output('filter-dropdown', 'options'),
+              [dash.dependencies.Input('x-axis-dropdown', 'value')])
+def remove_selected_filter_value(input_filter_value):
+    if input_filter_value is not None:
+        print(input_filter_value)
+        return [{'label': i, 'value': i} for i in ReadDataFromCsv.columns[1:12] if i != input_filter_value]
+    else:
+        return []
+
 @app.callback(dash.dependencies.Output('filter-dropdown-values', 'options'),
               [dash.dependencies.Input('filter-dropdown', 'value')])
 def update_filter_values(input_filter_value):
-    opts = ReadDataFromCsv[input_filter_value].unique().tolist()
-    options = [{'label': i, 'value': i} for i in opts]
-    value = opts[0]
-    #return [{'label': i, 'value': i} for i in ReadDataFromCsv[input_filter_value].unique()]
-
-    return [{'label': i, 'value': i} for i in opts]
-    """return {
-        options: options,
-        value: value
-    }"""
-
-"""@app.callback(dash.dependencies.Output('heart-data-plot', 'figure'),
-             [dash.dependencies.Input('x-axis-dropdown', 'value')])
-def update_attribute(input_value):
-        WightTrueGroupWhere = ReadDataFromCsv.loc[ReadDataFromCsv['CARDIO_DISEASE'] == 1]
-        WightFalseGroupWhere = ReadDataFromCsv.loc[ReadDataFromCsv['CARDIO_DISEASE'] == 0]
-
-        WightTrueGroup = WightTrueGroupWhere.groupby([input_value], as_index=False)[
-            "CARDIO_DISEASE"].count()
-        WightFalseGroup = WightFalseGroupWhere.groupby([input_value], as_index=False)[
-            "CARDIO_DISEASE"].count()
-
-        print(WightTrueGroup)
-        print(WightFalseGroup)
-        WightTrueGroup.columns = [input_value, 'CARDIO_DISEASE_TRUE']
-        WightFalseGroup.columns = [input_value, 'CARDIO_DISEASE_FALSE']
-
-        WightTrueGroup.append(WightFalseGroup)
-
-        WightFalseGroup.drop(input_value, axis=1, inplace=True)
-
-        CombinedColumns = pd.concat([WightTrueGroup, WightFalseGroup], axis=1)
-
-        print(CombinedColumns.head(10))
-        data = []
-        trace_PA_True = go.Bar(
-            name="Positive",
-            x=CombinedColumns[input_value],
-            y=CombinedColumns["CARDIO_DISEASE_TRUE"],
-            offsetgroup=0,
-        )
-
-        trace_PA_False = go.Bar(
-            name="Negative",
-            x=CombinedColumns[input_value],
-            y=CombinedColumns["CARDIO_DISEASE_FALSE"],
-            offsetgroup=1,
-        )
-
-        data.append(trace_PA_False)
-        data.append(trace_PA_True)
-        layout = {"title": input_value + " vs Cardio Disease graph"}
-
-        return {
-            "data": data,
-            "layout": layout
-        }"""
-
+    if input_filter_value is not None:
+        opts = ReadDataFromCsv[input_filter_value].unique().tolist()
+        options = [{'label': i, 'value': i} for i in opts]
+        value = opts[0]
+        if input_filter_value == 'GENDER':
+            return [{
+                'label': 'Male', 'value': 1
+            },{
+                'label': 'Female', 'value': 2
+            }]
+        elif input_filter_value == 'SMOKE' or input_filter_value == 'ALCOHOL' or input_filter_value == 'PHYSICAL_ACTIVITY' :
+            return [{
+                'label': 'True', 'value': 1
+            }, {
+                'label': 'False', 'value': 0
+            }]
+        elif input_filter_value == 'CHOLESTEROL' or input_filter_value == 'GLUCOSE':
+            return [{
+                'label': 'Minimum', 'value': 1
+            },
+            {
+                'label': 'Medium', 'value': 2
+            },
+            {
+                'label': 'Maximum', 'value': 3
+            }
+            ]
+        elif  input_filter_value == 'AGE' or input_filter_value == 'HEIGHT' or input_filter_value == 'WEIGHT' or input_filter_value == 'AP_HIGH' or input_filter_value == 'AP_LOW':
+            return [{'label': i, 'value': i} for i in opts]
+        else:
+            return []
 
 @app.callback(dash.dependencies.Output('heart-data-plot', 'figure'),
               [dash.dependencies.Input('x-axis-dropdown', 'value'),
@@ -176,23 +153,24 @@ def update_filter_attribute(input_value,input_filter,input_filter_value):
         WightTrueGroupWhere = ReadDataFromCsv.loc[ReadDataFromCsv['CARDIO_DISEASE'] == 1]
         WightFalseGroupWhere = ReadDataFromCsv.loc[ReadDataFromCsv['CARDIO_DISEASE'] == 0]
 
-        if  input_filter != "None" and input_value != "None" and input_filter_value != "None":
-            print("if loop 3 conditions")
-            WightTrueGroup = WightTrueGroupWhere.groupby([input_value,input_filter], as_index=False)["CARDIO_DISEASE"].count()
-            WightFalseGroup = WightFalseGroupWhere.groupby([input_value,input_filter], as_index=False)["CARDIO_DISEASE"].count()
-            WightTrueGroup = WightTrueGroup.loc[WightTrueGroup[input_filter] == input_filter_value]
-            WightFalseGroup = WightFalseGroup.loc[WightFalseGroup[input_filter] == input_filter_value]
-        elif input_value != "None":
-             print("else conditions")
+        if  input_value is not None and input_filter is not None and input_filter_value is not None:
+
+            WightTrueGroup = WightTrueGroupWhere.loc[WightTrueGroupWhere[input_filter] == input_filter_value]
+            WightFalseGroup = WightFalseGroupWhere.loc[WightFalseGroupWhere[input_filter] == input_filter_value]
+            WightTrueGroup = WightTrueGroup.groupby([input_value,input_filter], as_index=False)["CARDIO_DISEASE"].count()
+            WightFalseGroup = WightFalseGroup.groupby([input_value,input_filter], as_index=False)["CARDIO_DISEASE"].count()
+
+        elif input_value is not None:
+
              WightTrueGroup = WightTrueGroupWhere.groupby([input_value], as_index=False)["CARDIO_DISEASE"].count()
              WightFalseGroup = WightFalseGroupWhere.groupby([input_value], as_index=False)["CARDIO_DISEASE"].count()
 
-        if  input_filter != "None" and input_value != "None":
-            print("if loop 2 conditions")
+        if  input_value is not None and input_filter is not None and input_filter_value is not None:
+
             WightTrueGroup.columns = [input_value,input_filter, 'CARDIO_DISEASE_TRUE']
             WightFalseGroup.columns = [input_value,input_filter, 'CARDIO_DISEASE_FALSE']
         else:
-            print("2nd else conditions")
+
             WightTrueGroup.columns = [input_value, 'CARDIO_DISEASE_TRUE']
             WightFalseGroup.columns = [input_value, 'CARDIO_DISEASE_FALSE']
 
@@ -203,30 +181,41 @@ def update_filter_attribute(input_value,input_filter,input_filter_value):
         WightFalseGroup.drop(input_value, axis=1, inplace=True)
 
         CombinedColumns = pd.concat([WightTrueGroup, WightFalseGroup], axis=1)
-
-        print(CombinedColumns.head(10))
         data = []
         trace_PA_True = go.Bar(
                name="Positive",
                x=CombinedColumns[input_value],
                y=CombinedColumns["CARDIO_DISEASE_TRUE"],
-               offsetgroup=0,
-        )
+               offsetgroup=0
+                )
+
 
         trace_PA_False = go.Bar(
             name="Negative",
             x=CombinedColumns[input_value],
             y=CombinedColumns["CARDIO_DISEASE_FALSE"],
             offsetgroup=1,
-        )
+            )
 
         data.append(trace_PA_False)
         data.append(trace_PA_True)
-        layout = {"title" : input_value+" vs Cardio Disease graph"}
+        if input_value is not None and input_filter is not None and input_filter_value is not None:
+            layout = go.Layout(
+                title=str(input_value).lower() + " & " + str(input_filter).lower() + " vs cardio disease graph",
+                yaxis_title = "Number of Cardio Disease Patients",
+                xaxis_title = str(input_value).lower() + " & " + str(input_filter).lower()
+            )
+
+        else:
+            layout = go.Layout(
+                title=str(input_value).lower() +" vs cardio disease graph",
+                yaxis_title = "Number of Cardio Disease Patients",
+                xaxis_title = str(input_value).lower()
+            )
 
         return {
-        "data": data,
-        "layout": layout
+            "data": data,
+            "layout": layout
         }
 
 
