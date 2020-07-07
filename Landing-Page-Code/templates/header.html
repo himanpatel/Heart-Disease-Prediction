@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+
+
+{% block title %} Heart Disease Data collection  {% endblock %}
+
+
+
+{% block body %}
+
+<!-- PRE LOADER -->
+<section class="preloader">
+    <div class="spinner">
+
+        <span class="spinner-rotate"></span>
+
+    </div>
+</section>
+
+
+
+
+
+<!-- MENU -->
+<section class="navbar navbar-default navbar-static-top" role="navigation">
+    <div class="container">
+
+        <div class="navbar-header">
+            <button class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon icon-bar"></span>
+                <span class="icon icon-bar"></span>
+                <span class="icon icon-bar"></span>
+            </button>
+
+            <!-- lOGO TEXT HERE -->
+            <a href="http://localhost/Heart-Disease-Prediction/index.html" class="navbar-brand"><i class="fa fa-h-square"></i>Heart Disease Prediction</a>
+        </div>
+
+        <!-- MENU LINKS -->
+        <div class="collapse navbar-collapse">
+            <ul class="nav navbar-nav navbar-right">
+               
+                <li><a target="_blank" href="http://127.0.0.1:8050/" class="smoothScroll">Dashboard</a></li>
+                <li><a href="http://127.0.0.1:5000/" class="smoothScroll">Prediction Form</a></li>
+                <li><a href="http://127.0.0.1:8053/" class="smoothScroll">Manage Patients</a></li>
+
+            </ul>
+        </div>
+
+    </div>
+</section>
+
+
+{% endblock %}

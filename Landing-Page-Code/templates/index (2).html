@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Testing </title>
+</head>
+<body>
+<form action="{{url_for('post_item')}}"
+      method = "POST">
+    <input type = "text" id="name" name="fname"
+           placeholder="FirstName">
+    <input type = "text" id="lname" name="lname"
+           placeholder="LastName">
+    <input type ="text" id="id" name="id">
+    <input type = "submit" id="submit" value="Press me"
+
+           >
+
+
+    <div class = "modal-body">
+
+        <form action ="{{url_for('update_item')}}" method=" POST">
+            <div class="form-group">
+                <label>Name:</label>
+                <input type = "submit" id="update" value="Update Record">
+            </div>
+
+
+        </form>
+
+
+
+    </div>
+
+
+    <div class = "modal-body">
+
+        <form action ="{{url_for('delete_item')}}" method=" POST">
+            <div class="form-group">
+                <label>Name:</label>
+                <input type = "submit" id="delete" value="Delete">
+            </div>
+
+
+        </form>
+
+<div class = "modal-body">
+
+        <form action ="{{url_for('read_item')}}" method=" POST">
+            <div class="form-group">
+                <label>Name:</label>
+                <input type = "submit" id="read" value="Read">
+            </div>
+
+
+        </form>
+
+
+
+    </div>
+
+    </div>
+
+
+
+</form>
+</body>
+
+
+
+
+</form>
+
+</body>
+</html>
